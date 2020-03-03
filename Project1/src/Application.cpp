@@ -2,7 +2,54 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 
+struct ShaderSource
+{
+    std::string vsSource;
+    std::string fsSource;
+};
+
+static ShaderSource ParseShader(const std::string &filePath)
+{
+    enum class ShaderType
+    {
+        NONE = -1,
+        VERTEX = 0,
+        FRAGMENT = 1
+    };
+
+    std::ifstream stream(filePath);
+
+    std::string line;
+
+    std::stringstream ss[2];
+
+    ShaderType type = ShaderType::NONE;
+
+    while (getline(stream, line))
+    {
+        if (line.find("#shader") != line.npos)
+        {
+            if (line.find("vertex") != line.npos)
+                type = ShaderType::VERTEX;
+            else if (line.find("fragment") != line.npos)
+                type = ShaderType::FRAGMENT;
+        }
+        else
+        {
+            ss[(int)type] << line << "\n";
+        }
+    }
+
+    ShaderSource source;
+    source.vsSource = ss[(int)ShaderType::VERTEX].str();
+    source.fsSource = ss[(int)ShaderType::FRAGMENT].str();
+
+    return source;
+}
 
 static unsigned int CompileShader(GLenum type, const std::string &source)
 {
@@ -90,24 +137,8 @@ int main(void)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);   // 最后一个参数也许是为了节省带宽，所以把offset转成（void*）因为它只有1 byte
 
-    const std::string vertexShader = 
-        "#version 330 core\n"
-        "layout(location = 0) in vec4 position;\n"
-        "void main()\n"
-        "{\n"
-        "    gl_Position = position;\n"
-        "}\n";
-
-    const std::string fragmentShader = 
-        "#version 330 core\n"
-        "layout(location = 0) out vec4 color;\n"
-        "void main()\n"
-        "{\n"
-        "    color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-        "}\n"
-        "";
-
-    unsigned int shader = CreateShader(vertexShader, fragmentShader);
+    ShaderSource source = ParseShader("resources/shaders/Basic.shader");
+    unsigned int shader = CreateShader(source.vsSource, source.fsSource);
 
     glUseProgram(shader);
 

@@ -12,99 +12,7 @@
 #include "IndexBuffer.h"
 #include "VertexBufferLayout.h"
 #include "VertexArray.h"
-
-
-struct ShaderSource
-{
-    std::string vsSource;
-    std::string fsSource;
-};
-
-static ShaderSource ParseShader(const std::string &filePath)
-{
-    enum class ShaderType
-    {
-        NONE = -1,
-        VERTEX = 0,
-        FRAGMENT = 1
-    };
-
-    std::ifstream stream(filePath);
-
-    std::string line;
-
-    std::stringstream ss[2];
-
-    ShaderType type = ShaderType::NONE;
-
-    while (getline(stream, line))
-    {
-        if (line.find("#shader") != line.npos)
-        {
-            if (line.find("vertex") != line.npos)
-                type = ShaderType::VERTEX;
-            else if (line.find("fragment") != line.npos)
-                type = ShaderType::FRAGMENT;
-        }
-        else
-        {
-            ss[(int)type] << line << "\n";
-        }
-    }
-
-    ShaderSource source;
-    source.vsSource = ss[(int)ShaderType::VERTEX].str();
-    source.fsSource = ss[(int)ShaderType::FRAGMENT].str();
-
-    return source;
-}
-
-static unsigned int CompileShader(GLenum type, const std::string &source)
-{
-    unsigned int shader = glCreateShader(type);
-    const char *src = source.c_str();
-    CALL_GL_API(glShaderSource(shader, 1, &src, nullptr));
-    CALL_GL_API(glCompileShader(shader));
-
-    // Error checking
-    int result;
-    CALL_GL_API(glGetShaderiv(shader, GL_COMPILE_STATUS, &result));
-    if (result == GL_FALSE)
-    {
-        int length;
-        CALL_GL_API(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
-        char *message = (char*)alloca(length * sizeof(char));   // alloca直接在栈上分配
-        CALL_GL_API(glGetShaderInfoLog(shader, length, &length, message));
-        std::cout << "Failed to compile : " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
-        std::cout << message << std::endl;
-        CALL_GL_API(glDeleteShader(shader)) ;
-        return 0;
-    }
-
-    return shader;
-}
-
-static unsigned int CreateShader(const std::string& vsSource, const std::string& fsSource)
-{
-    unsigned int program = glCreateProgram();
-
-    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vsSource);
-    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fsSource);
-    
-    CALL_GL_API(glAttachShader(program, vs));
-    CALL_GL_API(glAttachShader(program, fs));
-
-    CALL_GL_API(glLinkProgram(program));
-    CALL_GL_API(glValidateProgram(program));
-
-    CALL_GL_API(glDetachShader(program, vs));
-    CALL_GL_API(glDetachShader(program, fs));
-
-    CALL_GL_API(glDeleteShader(vs));
-    CALL_GL_API(glDeleteShader(fs));
-
-    return program;
-}
+#include "Shader.h"
 
 
 int main(void)
@@ -159,12 +67,7 @@ int main(void)
         };
         IndexBuffer EBO(index, sizeof(index));
 
-
-        ShaderSource source = ParseShader("resources/shaders/Basic.shader");
-        unsigned int shader = CreateShader(source.vsSource, source.fsSource);
-
-        int location = glGetUniformLocation(shader, "u_Color");
-        assert(location >= 0);
+        Shader shader("resources/shaders/Basic.shader");
 
         float r = 0.00f;
         /* Loop until the user closes the window */
@@ -173,9 +76,8 @@ int main(void)
             /* Render here */
             CALL_GL_API(glClear(GL_COLOR_BUFFER_BIT));
 
-            CALL_GL_API(glUseProgram(shader));
-            CALL_GL_API(glUniform4f(location, r, 1.0f, 0.0f, 1.0f));
-
+            shader.SetUniform4f("u_Color", r, 1.0f, 0.0f, 1.0f);
+            shader.Bind();
             VAO.Bind();
             VBO.Bind();
             EBO.Bind();
@@ -191,8 +93,6 @@ int main(void)
             /* Poll for and process events */
             glfwPollEvents();
         }
-
-        CALL_GL_API(glDeleteProgram(shader));
     }
     glfwTerminate();
     return 0;

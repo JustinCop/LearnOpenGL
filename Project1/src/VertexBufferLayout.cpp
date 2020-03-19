@@ -10,16 +10,3 @@ VertexBufferLayout::~VertexBufferLayout()
 {
 }
 
-void VertexBufferLayout::Push(unsigned int count, GLenum type)
-{
-    m_Elements.push_back({ count, type, GL_FALSE });
-    switch (type)
-    {
-    case GL_FLOAT:
-        m_Stride += count * sizeof(float);
-        break;
-    default:
-        assert(false);
-    }
-}
-

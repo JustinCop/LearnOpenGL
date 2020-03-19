@@ -10,7 +10,7 @@ struct VertexBufferElement
     GLenum type;
     bool normalized;
 
-    static unsigned int GetSizeOfType(GLenum type)
+    unsigned int GetTypeSize() const
     {
         switch (type)
         {
@@ -32,7 +32,20 @@ public:
     VertexBufferLayout();
     ~VertexBufferLayout();
 
-    void Push(unsigned int count, GLenum type);
+    template<typename T>
+    void Push(unsigned int count)
+    {
+        assert(false);
+    }
+
+    template<>
+    void Push<float>(unsigned int count)
+    {
+        m_Elements.push_back({ count, GL_FLOAT, GL_FALSE });
+        m_Stride += count * sizeof(float);
+    }
+
+
     auto GetElements() const { return m_Elements; }
     unsigned int GetStride() const { return m_Stride; }
 };

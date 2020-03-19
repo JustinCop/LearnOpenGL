@@ -56,7 +56,7 @@ int main(void)
         VertexBuffer VBO(position, sizeof(position));
 
         VertexBufferLayout layout;
-        layout.Push(2, GL_FLOAT);
+        layout.Push<float>(2);
 
         VertexArray VAO;
         VAO.AddBuffer(VBO, layout);

@@ -113,24 +113,24 @@ void Shader::UnBind()
     CALL_GL_API(glUseProgram(0));
 }
 
-bool Shader::SetUniform4f(const char *name, float v0, float v1, float v2, float v3)
+bool Shader::SetUniform4f(const char *var, float v0, float v1, float v2, float v3)
 {
-    if (m_UniformLocations.find(name) == m_UniformLocations.end())
+    // query if locations is already cached in this shader object, if not, find the actual location and cache it.
+    if (m_UniformLocations.find(var) == m_UniformLocations.end())
     {
-        int location = CALL_GL_API(glGetUniformLocation(m_RendererID, name));
+        int location = CALL_GL_API(glGetUniformLocation(m_RendererID, var));
         if (location == -1)
         {
-            std::cout << "ERROR: shader doesn't have uniform variable: " << name << std::endl;
+            std::cout << "ERROR: shader doesn't have uniform variable: " << var << std::endl;
             return false;
         }
         else
         {
-            m_UniformLocations[name] = location;
+            m_UniformLocations[var] = location;
         }
     }
 
-    int location = m_UniformLocations[name];
+    int location = m_UniformLocations[var];
     Bind();
     CALL_GL_API(glUniform4f(location, v0, v1, v2, v3));
-    UnBind();
 }

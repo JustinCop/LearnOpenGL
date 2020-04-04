@@ -6,8 +6,8 @@
 
 struct VertexBufferElement
 {
-    unsigned int count;
-    GLenum type;
+    unsigned int count; // number of scalar per vertex
+    GLenum type;        // data type
     bool normalized;
 
     unsigned int GetTypeSize() const

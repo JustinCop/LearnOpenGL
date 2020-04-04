@@ -15,5 +15,12 @@ public:
     void Bind();
     void Unbind();
 
-    void AddBuffer(const VertexBuffer& buffer, const VertexBufferLayout& layout);
+    /* 
+    buffer: data only, nothing else.
+    layout: how to explain data.
+    Basically, layout is something like:
+        { {3 float unnormalized}, {3 float normalized}, {2 int unnormalized} }
+    and with other details.
+    */
+    void AddBuffer(const VertexBuffer* pBuffer, const VertexBufferLayout* pLayout);
 };

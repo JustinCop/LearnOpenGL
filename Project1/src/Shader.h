@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <map>
 
+// warning: use Unbind() explicitly. don't use it in member function, since it may unbind something need currently.
+
 struct ShaderSource
 {
     std::string vsSource;

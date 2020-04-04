@@ -16,3 +16,24 @@ void ValidateOglApiCall(const char *apiCallStr, const char *file, unsigned int l
 
 #define CALL_GL_API(apiCall) apiCall;\
     ValidateOglApiCall(#apiCall, __FILE__, __LINE__);
+
+Renderer::Renderer()
+{
+}
+
+Renderer::~Renderer()
+{
+}
+
+void Renderer::Clear()
+{
+    CALL_GL_API(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+void Renderer::Draw(VertexArray *pVao, IndexBuffer *pEbo, Shader *pShader)
+{
+    pVao->Bind();
+    pEbo->Bind();
+    pShader->Bind();
+    CALL_GL_API(glDrawElements(GL_TRIANGLES, pEbo->GetCount(), GL_UNSIGNED_INT, (void *)0));
+}

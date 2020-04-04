@@ -13,7 +13,15 @@
 #include "VertexBufferLayout.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Renderer.h"
 
+/* How to use Renderer:
+    All you need to give to Renderer is as below:
+        VertexArray
+        IndexBuffer
+        Shader
+    Don't need to give VertexBuffer: is't already bound to VertexArray
+*/
 
 int main(void)
 {
@@ -59,7 +67,7 @@ int main(void)
         layout.Push<float>(2);
 
         VertexArray VAO;
-        VAO.AddBuffer(VBO, layout);
+        VAO.AddBuffer(&VBO, &layout);
 
         unsigned int index[] = {
             0, 1, 2,
@@ -69,23 +77,19 @@ int main(void)
 
         Shader shader("resources/shaders/Basic.shader");
 
-        float r = 0.00f;
+        Renderer renderer;
+
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
             /* Render here */
-            CALL_GL_API(glClear(GL_COLOR_BUFFER_BIT));
+            renderer.Clear();
 
-            shader.SetUniform4f("u_Color", r, 1.0f, 0.0f, 1.0f);
+            // currently need to set uniform explicitly; will material to include uniform in renderer.
             shader.Bind();
-            VAO.Bind();
-            VBO.Bind();
-            EBO.Bind();
-            CALL_GL_API(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *)0));
-
-            if (r >= 1.0f)
-                r = 0.0f;
-            r += 0.01f;
+            shader.SetUniform4f("u_Color", 0.0f, 1.0f, 0.0f, 1.0f);
+            
+            renderer.Draw(&VAO, &EBO, &shader);
 
             /* Swap front and back buffers */
             CALL_GL_API(glfwSwapBuffers(window));

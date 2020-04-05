@@ -23,12 +23,13 @@ private:
     ShaderSource ParseShader(const std::string &filePath);
     unsigned int CompileShader(GLenum type, const std::string &source);
     unsigned int CreateShader(const std::string &vsSource, const std::string &fsSource);
-
+    int GetUniformLocation(const char *name);
 public:
     Shader(const std::string &filePath);
     ~Shader();
     void Bind();
     void UnBind();
 
-    bool SetUniform4f(const char *name, float v0, float v1, float v2, float v3);
+    void SetUniform1i(const char *name, int value);
+    void SetUniform4f(const char *name, float v0, float v1, float v2, float v3);
 };

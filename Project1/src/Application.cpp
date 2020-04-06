@@ -15,6 +15,8 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "Texture.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 /* How to use Renderer:
     All you need to give to Renderer is as below:
@@ -84,6 +86,12 @@ int main(void)
         Texture texture("resources/textures/food.png");
         texture.Bind();
 
+        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+
+        // blend mode
+        CALL_GL_API(glEnable(GL_BLEND));
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
@@ -93,7 +101,8 @@ int main(void)
             // currently need to set uniform explicitly; will material to include uniform in renderer.
             shader.Bind();
             shader.SetUniform4f("u_Color", 0.0f, 1.0f, 0.0f, 1.0f);
-            shader.SetUniform1i("u_Texture", 0);         
+            shader.SetUniform1i("u_Texture", 0);
+            shader.SetUniformMat4("u_MVP", proj);
 
             renderer.Draw(&VAO, &EBO, &shader);
 

@@ -1,10 +1,2 @@
 ﻿  Application.cpp
-  IndexBuffer.cpp
-  Renderer.cpp
-  Shader.cpp
-  Texture.cpp
-  VertexArray.cpp
-  VertexBuffer.cpp
-  Generating Code...
-C:\dev\LearnOpenGL\Project1\src\VertexBufferLayout.h(22): warning C4715: 'VertexBufferElement::GetTypeSize': not all control paths return a value
   Project1.vcxproj -> C:\dev\LearnOpenGL\Debug\Project1.exe

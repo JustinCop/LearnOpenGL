@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <map>
+#include "glm/glm.hpp"
 
 // warning: use Unbind() explicitly. don't use it in member function, since it may unbind something need currently.
 
@@ -32,4 +33,5 @@ public:
 
     void SetUniform1i(const char *name, int value);
     void SetUniform4f(const char *name, float v0, float v1, float v2, float v3);
+    void SetUniformMat4(const char *name, glm::mat4 mat);
 };
